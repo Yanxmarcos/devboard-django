@@ -1,0 +1,34 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Check project configuration
+        env:
+          SECRET_KEY: ci-only-secret-key
+          DEBUG: "False"
+          ALLOWED_HOSTS: localhost
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+      - name: Run tests with coverage
+        env:
+          SECRET_KEY: ci-only-secret-key
+          DEBUG: "False"
+          ALLOWED_HOSTS: localhost
+        run: coverage run manage.py test
+      - name: Coverage report
+        run: coverage report --fail-under=80

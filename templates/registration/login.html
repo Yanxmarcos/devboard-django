@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión · DevBoard{% endblock %}
+{% block content %}<div class="auth-page"><div class="auth-card"><div class="text-center mb-4"><span class="brand-mark brand-mark-lg"><i class="bi bi-grid-1x2-fill"></i></span><h1>Bienvenido</h1><p class="text-secondary">Ingresa para continuar con tus proyectos.</p></div>
+{% if form.errors %}<div class="alert alert-danger">El usuario o la contraseña no son correctos.</div>{% endif %}
+<form method="post" class="app-form">{% csrf_token %}<div class="mb-3"><label for="id_username">Usuario</label>{{ form.username }}</div><div class="mb-3"><div class="d-flex justify-content-between"><label for="id_password">Contraseña</label></div>{{ form.password }}</div><button class="btn btn-primary w-100 py-2" type="submit">Iniciar sesión</button></form><p class="text-center text-secondary mt-4 mb-0">¿Aún no tienes cuenta? <a href="{% url 'signup' %}">Regístrate</a></p></div></div>{% endblock %}

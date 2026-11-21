@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} · DevBoard{% endblock %}
+{% block content %}
+<div class="container page-container">
+    <a class="back-link" href="{{ task.project.get_absolute_url }}"><i class="bi bi-arrow-left"></i> {{ task.project.name }}</a>
+    <div class="row g-4 mt-1">
+        <div class="col-lg-8">
+            <section class="panel">
+                <div class="d-flex justify-content-between gap-3">
+                    <div>
+                        <span class="badge-priority priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+                        <h1 class="page-title mt-3">{{ task.title }}</h1>
+                    </div>
+                    {% if can_edit %}
+                    <div class="dropdown">
+                        <button class="btn btn-icon" data-bs-toggle="dropdown" aria-label="Acciones de tarea"><i class="bi bi-three-dots"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'task_update' task.pk %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'task_delete' task.pk %}"><i class="bi bi-trash me-2"></i>Eliminar</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="task-description">
+                    {% if task.description %}{{ task.description|linebreaks }}{% else %}<p class="text-secondary">Esta tarea no tiene descripción.</p>{% endif %}
+                </div>
+                <hr>
+                <h2 class="h5">Comentarios <span class="text-secondary">{{ task.comments.count }}</span></h2>
+                <div class="comments mt-3">
+                    {% for comment in task.comments.all %}
+                    <div class="comment">
+                        <span class="avatar">{{ comment.author.username|first|upper }}</span>
+                        <div>
+                            <div><strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong><small>{{ comment.created_at|timesince }}</small></div>
+                            <p>{{ comment.body|linebreaksbr }}</p>
+                        </div>
+                    </div>
+                    {% empty %}<p class="text-secondary">Aún no hay comentarios.</p>{% endfor %}
+                </div>
+                <form action="{% url 'comment_create' task.pk %}" method="post" class="app-form mt-4">
+                    {% csrf_token %}
+                    {{ comment_form.body }}
+                    <div class="text-end mt-2"><button class="btn btn-primary">Publicar comentario</button></div>
+                </form>
+            </section>
+        </div>
+        <div class="col-lg-4">
+            <section class="panel task-meta">
+                <h2 class="h5 mb-4">Detalles</h2>
+                <div><span>Estado</span><strong>{{ task.get_status_display }}</strong></div>
+                <div><span>Responsable</span><strong>{% if task.assignee %}{{ task.assignee.get_full_name|default:task.assignee.username }}{% else %}Sin asignar{% endif %}</strong></div>
+                <div><span>Fecha límite</span><strong>{{ task.due_date|date:"d M Y"|default:"Sin fecha" }}</strong></div>
+                <div><span>Creada por</span><strong>{{ task.created_by.get_full_name|default:task.created_by.username }}</strong></div>
+                <div><span>Último cambio</span><strong>{{ task.updated_at|timesince }}</strong></div>
+                {% if can_edit %}
+                <hr>
+                <form method="post" action="{% url 'task_status' task.pk %}" class="app-form">
+                    {% csrf_token %}
+                    <label for="task-status">Cambiar estado</label>
+                    <select id="task-status" name="status" onchange="this.form.submit()">
+                        {% for value,label in statuses %}<option value="{{ value }}" {% if task.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                    </select>
+                </form>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Resumen · DevBoard{% endblock %}
+{% block content %}
+<div class="container page-container">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div><span class="text-secondary">Bienvenido de nuevo</span><h1 class="page-title mb-0">{{ user.first_name|default:user.username }}</h1></div>
+        <a href="{% url 'project_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Nuevo proyecto</a>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><div class="stat-card"><span class="stat-icon icon-purple"><i class="bi bi-folder2-open"></i></span><div><strong>{{ project_count }}</strong><span>Proyectos</span></div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card"><span class="stat-icon icon-blue"><i class="bi bi-list-check"></i></span><div><strong>{{ open_task_count }}</strong><span>Tareas abiertas</span></div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card"><span class="stat-icon icon-red"><i class="bi bi-clock-history"></i></span><div><strong>{{ overdue_task_count }}</strong><span>Vencidas</span></div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card"><span class="stat-icon icon-green"><i class="bi bi-person-check"></i></span><div><strong>{{ membership_count }}</strong><span>Colaboraciones</span></div></div></div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <section class="panel h-100">
+                <div class="panel-heading"><div><h2>Mis tareas</h2><p>Trabajo pendiente asignado a ti</p></div></div>
+                {% if my_tasks %}
+                    <div class="table-responsive"><table class="table align-middle app-table"><thead><tr><th>Tarea</th><th>Proyecto</th><th>Prioridad</th><th>Fecha límite</th></tr></thead><tbody>
+                    {% for task in my_tasks %}<tr><td><a class="fw-semibold" href="{{ task.get_absolute_url }}">{{ task.title }}</a></td><td>{{ task.project.name }}</td><td><span class="badge-priority priority-{{ task.priority }}">{{ task.get_priority_display }}</span></td><td>{{ task.due_date|date:"d M"|default:"Sin fecha" }}</td></tr>{% endfor %}
+                    </tbody></table></div>
+                {% else %}<div class="empty-state py-5"><i class="bi bi-check2-circle"></i><h3>Todo al día</h3><p>No tienes tareas pendientes asignadas.</p></div>{% endif %}
+            </section>
+        </div>
+        <div class="col-lg-4">
+            <section class="panel h-100"><div class="panel-heading"><div><h2>Distribución</h2><p>Tareas por estado</p></div></div><div class="chart-wrap"><canvas id="statusChart"></canvas></div></section>
+        </div>
+        <div class="col-lg-7">
+            <section class="panel"><div class="panel-heading"><div><h2>Proyectos recientes</h2><p>Vista general del avance</p></div><a href="{% url 'project_list' %}">Ver todos</a></div>
+                {% for project in recent_projects %}<a href="{{ project.get_absolute_url }}" class="project-row"><span class="project-color" style="background:{{ project.color }}"></span><div class="flex-grow-1"><strong>{{ project.name }}</strong><div class="progress mt-2" role="progressbar"><div class="progress-bar" style="width:{% widthratio project.completed_tasks project.total_tasks 100 %}%;background:{{ project.color }}"></div></div></div><span class="text-secondary small">{{ project.completed_tasks }}/{{ project.total_tasks }}</span></a>{% empty %}<div class="empty-state"><p>Aún no has creado proyectos.</p></div>{% endfor %}
+            </section>
+        </div>
+        <div class="col-lg-5">
+            <section class="panel"><div class="panel-heading"><div><h2>Actividad reciente</h2><p>Últimos cambios de tu equipo</p></div></div>
+                <div class="activity-list">{% for activity in recent_activity %}<div class="activity-item"><span class="activity-dot"></span><div><p><strong>{{ activity.user.username|default:"Usuario eliminado" }}</strong> {{ activity.description }}</p><small>{{ activity.project.name }} · {{ activity.created_at|timesince }}</small></div></div>{% empty %}<div class="empty-state"><p>La actividad aparecerá aquí.</p></div>{% endfor %}</div>
+            </section>
+        </div>
+    </div>
+</div>
+{{ status_labels|json_script:"chart-labels" }}
+{{ status_values|json_script:"chart-values" }}
+{% endblock %}
+{% block scripts %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script><script>
+const canvas=document.getElementById('statusChart');if(canvas){new Chart(canvas,{type:'doughnut',data:{labels:JSON.parse(document.getElementById('chart-labels').textContent),datasets:[{data:JSON.parse(document.getElementById('chart-values').textContent),backgroundColor:['#a5b4fc','#60a5fa','#fbbf24','#34d399'],borderWidth:0}]},options:{cutout:'72%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:18}}}}});}
+</script>{% endblock %}

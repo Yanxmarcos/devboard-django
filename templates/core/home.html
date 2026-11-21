@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}DevBoard · Proyectos que avanzan{% endblock %}
+{% block content %}
+<section class="hero-section">
+    <div class="container py-5">
+        <div class="row align-items-center g-5 py-lg-5">
+            <div class="col-lg-6">
+                <span class="eyebrow"><i class="bi bi-stars"></i> Trabajo en equipo, sin ruido</span>
+                <h1 class="display-3 fw-bold mt-3">Convierte las ideas en <span class="text-gradient">resultados.</span></h1>
+                <p class="lead text-secondary mt-4">Organiza proyectos, asigna responsabilidades y mantén a todo tu equipo al día desde un tablero claro y sencillo.</p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    {% if user.is_authenticated %}
+                        <a class="btn btn-primary btn-lg" href="{% url 'dashboard' %}">Ir a mi espacio <i class="bi bi-arrow-right ms-2"></i></a>
+                    {% else %}
+                        <a class="btn btn-primary btn-lg" href="{% url 'signup' %}">Comenzar gratis <i class="bi bi-arrow-right ms-2"></i></a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{% url 'login' %}">Ya tengo una cuenta</a>
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-wrap gap-4 mt-5 text-secondary small">
+                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> Roles y permisos</span>
+                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> Actividad en tiempo real</span>
+                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> Panel visual</span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-board shadow-lg">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div><span class="project-dot"></span><strong> Lanzamiento web</strong></div>
+                        <div class="avatar-stack"><span class="avatar">A</span><span class="avatar">M</span><span class="avatar">+2</span></div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6"><div class="mini-column"><span class="column-title">PENDIENTE</span><div class="mini-task"><span class="priority priority-high"></span><strong>Diseñar portada</strong><small>Hoy</small></div><div class="mini-task"><span class="priority"></span><strong>Revisar contenido</strong><small>Mañana</small></div></div></div>
+                        <div class="col-6"><div class="mini-column"><span class="column-title">EN PROGRESO</span><div class="mini-task"><span class="priority priority-urgent"></span><strong>Integrar registro</strong><small>Marcos</small></div><div class="mini-task task-done"><i class="bi bi-check-circle-fill"></i><strong>Definir alcance</strong></div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="container py-5">
+    <div class="text-center mx-auto section-heading">
+        <span class="eyebrow">Todo en un solo lugar</span>
+        <h2 class="fw-bold mt-3">Menos seguimiento. Más progreso.</h2>
+        <p class="text-secondary">Las herramientas necesarias para coordinar un equipo pequeño sin perder el control.</p>
+    </div>
+    <div class="row g-4 mt-3">
+        <div class="col-md-4"><article class="feature-card"><span class="feature-icon"><i class="bi bi-kanban"></i></span><h3>Tablero visual</h3><p>Consulta el estado del trabajo y mueve cada tarea a través de un flujo claro.</p></article></div>
+        <div class="col-md-4"><article class="feature-card"><span class="feature-icon"><i class="bi bi-people"></i></span><h3>Colaboración</h3><p>Define responsables, roles de acceso y comentarios dentro de cada tarea.</p></article></div>
+        <div class="col-md-4"><article class="feature-card"><span class="feature-icon"><i class="bi bi-graph-up-arrow"></i></span><h3>Visibilidad</h3><p>Revisa indicadores, fechas límite y la actividad reciente de tus proyectos.</p></article></div>
+    </div>
+</section>
+{% endblock %}
